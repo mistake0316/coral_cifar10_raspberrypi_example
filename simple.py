@@ -1,8 +1,9 @@
+import os
 import numpy as np
 import tflite_runtime.interpreter as tflite
 import platform
 from PIL import Image
-
+from camera import get_one_image_raspberrypi
 
 EDGETPU_SHARED_LIB = {
   'Linux': 'libedgetpu.so.1',
@@ -14,8 +15,6 @@ model_file = "./models/Cifar10_CNN_quant_edgetpu.tflite"
 image_file = "./images/img_0_label_3.jpg"
 label_file = "./models/Cifar10_label.txt"
 
-image = np.array(Image.open(image_file).convert("RGB")).astype(np.float32)
-image = np.expand_dims(image,0)
 interpreter = tflite.Interpreter(
       model_path=model_file,
       experimental_delegates=[
@@ -27,6 +26,11 @@ interpreter.allocate_tensors()
 
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
+
+# image = np.array(Image.open(image_file).convert("RGB")).astype(np.float32)
+PIL_image = get_one_image_raspberrypi(delay=5,preview=True).convert("RGB").resize(input_details[0]['shape'][-3:-1])
+image = np.array(PIL_image).astype(np.float32)
+image = np.expand_dims(image,0)
 
 interpreter.set_tensor(input_details[0]['index'], image)
 interpreter.invoke()
@@ -49,3 +53,11 @@ print("predictions:")
 for ith_rank in range(num_of_classes):
   print(f"{label_map[rank[ith_rank]]:>10}{rank[ith_rank]:>10}{output_data[rank[ith_rank]]:>10.3f}")
 
+folder = "output"
+try:
+  os.mkdir(folder)
+except:
+  pass
+out_name = folder + os.sep + f"{label_map[rank[0]]}_{output_data[rank[0]]:>.2f}.jpg"
+print("save file to", out_name, "...")
+PIL_image.save(out_name)
