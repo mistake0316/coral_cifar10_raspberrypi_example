@@ -58,6 +58,6 @@ try:
   os.mkdir(folder)
 except:
   pass
-out_name = folder + os.sep + f"{label_map[rank[0]]}_{output_data[rank[0]]:>.2f}.jpg"
+out_name = folder + os.sep + f"{label_map[rank[0]]}_{rank[0]}_{output_data[rank[0]]:>.2f}.jpg"
 print("save file to", out_name, "...")
 PIL_image.save(out_name)
