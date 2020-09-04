@@ -4,12 +4,15 @@ from time import sleep
 from picamera import PiCamera
 from PIL import Image
 import numpy as np
+import threading
+
+resolution = (256, 256)
 
 def get_one_image_raspberrypi(delay=2, preview=False):
   # Create the in-memory stream
   stream = BytesIO()
   camera = PiCamera()
-  camera.resolution = (256, 256)
+  camera.resolution = resolution
   if preview:
     camera.start_preview()
 
