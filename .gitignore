@@ -1,5 +1,5 @@
 output/
-models/*.tflite
+*.tflite
 
 # lines below are python dependence
 # Byte-compiled / optimized / DLL files
