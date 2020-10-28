@@ -1,6 +1,7 @@
 import tensorflow as tf
 import cv2
 import os
+import sys
 
 def main(N=50, outfolder="images"):
 
@@ -11,4 +12,11 @@ def main(N=50, outfolder="images"):
     cv2.imwrite(path, x[:,:,::-1])
 
 if __name__ == "__main__":
+  if len(sys.argv) > 1:
+    try:
+      main(int(sys.argv[1]))
+      exit()
+    except:
+      print("have some error, try default version (N=50)")
+      pass
   main()

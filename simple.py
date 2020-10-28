@@ -3,7 +3,8 @@ import numpy as np
 import tflite_runtime.interpreter as tflite
 import platform
 from PIL import Image
-from camera import get_one_image_raspberrypi
+from camera_util import get_one_image_raspberrypi
+import sys
 
 EDGETPU_SHARED_LIB = {
   'Linux': 'libedgetpu.so.1',
@@ -12,7 +13,6 @@ EDGETPU_SHARED_LIB = {
 }[platform.system()]
 
 model_file = "./models/Cifar10_CNN_quant_edgetpu.tflite"
-image_file = "./images/img_0_label_3.jpg"
 label_file = "./models/Cifar10_label.txt"
 
 interpreter = tflite.Interpreter(
@@ -28,7 +28,15 @@ input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 
 # image = np.array(Image.open(image_file).convert("RGB")).astype(np.float32)
-PIL_image = get_one_image_raspberrypi(delay=5,preview=True).convert("RGB").resize(input_details[0]['shape'][-3:-1])
+if len(sys.argv) > 1:
+  image_file = sys.argv[1]
+  PIL_image = Image.open(image_file)
+else:
+  try:
+    PIL_image = get_one_image_raspberrypi(delay=5,preview=True).convert("RGB").resize(input_details[0]['shape'][-3:-1])
+  except:
+    raise "have some error while loading image from pi camera"
+
 image = np.array(PIL_image).astype(np.float32)
 image = np.expand_dims(image,0)
 
